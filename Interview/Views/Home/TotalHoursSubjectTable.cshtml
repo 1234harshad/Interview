@@ -1,0 +1,89 @@
+﻿@{
+    ViewData["Title"] = "Generated Time Table";
+}
+@model TimeTableDataModelView
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<style>
+    .divsize{
+       width:60%;      
+       margin-left:20%;
+    }
+    .valspan{
+        color:red;
+        margin-left:2px;
+    }
+   .divmarg{
+       margin:10px;
+   }
+   table{
+       width:100%;
+       text-align:center;
+   }
+</style>
+<script>
+    function getTable(){
+        $('#timetable').show();
+        $('#maindiv').hide();
+    }
+    function shuffle(array) {
+        debugger;
+        let currentIndex = array.length, randomIndex;
+        while (currentIndex != 0) {
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex--;
+            [array[currentIndex], array[randomIndex]] = [
+                array[randomIndex], array[currentIndex]];
+        }
+        return array;
+    }
+    $(document).ready(function(){
+        var numRows = '@Model.SubjectPerDay';
+        var numCols = '@Model.TotalWorkDay';
+        var sub = [];
+        @foreach (var d in Model.SubjectName)
+        {
+        @:sub.push("@d");
+        }
+          const res = sub.reduce((acc, curr) => {
+          const tmp = Array.from({length: '@Model.Hours'}, () => curr);
+          acc.push(...tmp);
+          return acc;
+        }, []);
+        sub = shuffle(res);
+        var table = $("<table/>");
+        var row = $("<tr />");
+        var i=0;
+        for (var j = 0; j < numRows; j++) {
+            var addRow = row.clone();
+            for (var k = 0; k < numCols; k++) {
+                var cell = $('<td />');
+                cell.css({ "border": "solid 2px" });
+                cell.append("<p>" + res[i]+ "</p>");
+                addRow.append(cell);
+                 i++;
+            }
+            table.append(addRow);
+        }
+
+        $('#table').append(table);
+    });
+</script>
+<div class="divsize" id="timetable" style="display:none">
+    <h3>@ViewData["Title"]</h3>
+    <div id="table"></div>
+</div>
+<div id="maindiv" class="divsize">
+    <h3>Total Hours Of Each Subject For Total Working Days</h3>
+    <table border="2px">
+        <tr><th>Subject Name</th><th>Hours</th></tr>
+        @foreach(var s in Model.SubjectName)
+        {
+            <tr>
+                <td>@s</td><td>@Model.Hours</td>
+            </tr>
+        }
+    </table>
+
+<br />
+<button class="btn btn-primary" style="margin-left:40%"onclick="getTable()">Generate Table</button>
+</div>

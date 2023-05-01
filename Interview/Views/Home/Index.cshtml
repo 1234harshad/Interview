@@ -1,8 +1,92 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Time Table Form";
 }
-
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+@*<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>*@
+<style>
+    .divsize{
+       width:50%;      
+       text-align:center;
+    }
+    .valspan{
+        color:red;
+        margin-left:2px;
+    }
+   .divmarg{
+       margin:10px;
+   }
+</style>
+<script>
+  function getTotalHoursWeek(){
+        var noWorkDay = $('#txtNoWorkDay').val();
+        var noSubPerDay = $('#txtNoSubPerDay').val();
+       $('#txtTotalhoursWeek').val(noWorkDay * noSubPerDay);
+        var totalhoursWeek=$('#txtTotalhoursWeek').val();
+        if (totalhoursWeek !=null & totalhoursWeek!=""){
+            $("#btnSubmit").prop("disabled", false);
+        }
+    }
+    function submit()
+    {
+        debugger;
+        var totalhours = $('#txtTotalhoursWeek').val();
+        var totalsubject = $('#txtTotalSubject').val(); 
+        var noWorkDay = $('#txtNoWorkDay').val();
+        var options = document.getElementById('subjectsName').options, count = 0;
+        var perdaysub = $('#txtNoSubPerDay').val();
+        var subjectName=[];
+        for (var i=0; i < options.length; i++) {
+            opt = options[i];
+            if (opt.selected) 
+                subjectName.push(opt.text || opt.text);
+          if (options[i].selected) count++;
+        }
+        if (count == totalsubject)
+        {
+            window.location.href = '@Url.Action("TotalHoursSubjectTable", "Home")?hours=' + totalhours + '&subjectName=' + subjectName + '&totalWorkDay=' + noWorkDay+'&totalSubPerDay='+perdaysub;
+        }
+        else 
+        {
+            alert("Selected subject not match with total subjects");
+        }
+    }
+    window.onmousedown = function (e) {
+    var el = e.target;
+    if (el.tagName.toLowerCase() == 'option' && el.parentNode.hasAttribute('multiple')) {
+        e.preventDefault();
+        if (el.hasAttribute('selected')) el.removeAttribute('selected');
+        else el.setAttribute('selected', '');
+        var select = el.parentNode.cloneNode(true);
+        el.parentNode.parentNode.replaceChild(select, el.parentNode);
+    }
+}
+</script>
+<div class="divsize">
+    <h3>@ViewData["Title"]</h3>
+    <div class="row divmarg">
+        <label>Enter Working Days (accept number between 1 to 7)<span class="valspan"> * </span></label>
+    <input type="text" id="txtNoWorkDay"  placeholder="Enter no of working days" maxlength="1" oninput="this.value=this.value.replace(/[^1-7]/g,'');" />
+</div>
+    <div class="row divmarg">
+        <label>Enter Subjects Per Day (accept number less than 9)<span class="valspan">*</span></label>
+    <input type="text" id="txtNoSubPerDay" placeholder="Enter no of subjects per day" onchange="getTotalHoursWeek()" maxlength="1" oninput="this.value=this.value.replace(/[^0-8]/g,'');" />
+</div>
+    <div class="row divmarg">
+        <label>Total hours for week (auto generated)</label>
+        <input type="text" id="txtTotalhoursWeek" readonly />
+    </div>
+    <div class="row divmarg">
+        <label>Enter Total Subjects (accepts only number)<span class="valspan">*</span></label>
+        <input type="text" id="txtTotalSubject" placeholder="Enter total subjects" oninput="this.value=this.value.replace(/[^0-9]/g,'');" />
+    </div>
+    <div class="row divmarg">
+        <label>Select Subject<span class="valspan">*</span></label>
+        <select id="subjectsName" name="subjects" multiple>
+            <option value="guj">Gujarati</option>
+            <option value="eng">English</option>
+            <option value="sc">Science</option>
+            <option value="mth">Maths</option>
+        </select>
+    </div>
+<br />
+    <button id="btnSubmit" onclick="submit()" class="btn btn-primary divsize" disabled>Submit</button>
 </div>
